@@ -1,8 +1,3 @@
-# Define the path where the README.md file will be written
-readme_file_path = os.path.join(extraction_path_new, 'README.md')
-
-# Write the content of the README.md file
-readme_content = """
 # Blog Microservices Architecture
 
 ### Description
@@ -15,6 +10,75 @@ This project is a microservices-based architecture for a blog platform. It was o
 The project is containerized using Docker and orchestrated with Kubernetes for deployment and scaling.
 
 ---
+
+### Architecture Diagrams
+
+#### Original Monolithic Architecture
+```mermaid
+graph TD
+    Client[Client Browser]
+    
+    subgraph MonolithicApp[Monolithic Application]
+        Frontend[Frontend/UI Layer]
+        BusinessLogic[Business Logic Layer]
+        DatabaseInteraction[Database Interaction Layer]
+    end
+    
+    Database[(Database)]
+    
+    Client -->|HTTP/HTTPS| Frontend
+    Frontend --> BusinessLogic
+    BusinessLogic --> DatabaseInteraction
+    DatabaseInteraction -->|SQL/NoSQL| Database
+    Database -->|Data| DatabaseInteraction
+    
+    style MonolithicApp fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style Client fill:#b3e0ff,stroke:#333,stroke-width:2px
+    style Frontend fill:#d9edf7,stroke:#333,stroke-width:1px
+    style BusinessLogic fill:#dff0d8,stroke:#333,stroke-width:1px
+    style DatabaseInteraction fill:#fcf8e3,stroke:#333,stroke-width:1px
+    style Database fill:#ffe6cc,stroke:#333,stroke-width:2px
+```
+
+#### New Microservices Architecture
+```mermaid
+graph TD
+    Client[Client Browser]
+    Gateway[API Gateway]
+    
+    subgraph FrontendService[Frontend Service]
+        UI[UI Layer]
+    end
+    
+    subgraph UserService[User Service]
+        UserLogic[User Management]
+        UserDB[(User Database)]
+    end
+    
+    subgraph PostService[Post Service]
+        PostLogic[Post Management]
+        PostDB[(Post Database)]
+    end
+    
+    Client -->|HTTP/HTTPS| Gateway
+    Gateway -->|Route| UI
+    Gateway -->|Route| UserLogic
+    Gateway -->|Route| PostLogic
+    
+    UI <-->|API Calls| UserLogic
+    UI <-->|API Calls| PostLogic
+    
+    UserLogic -->|CRUD| UserDB
+    PostLogic -->|CRUD| PostDB
+    
+    style Client fill:#b3e0ff,stroke:#333,stroke-width:2px
+    style Gateway fill:#ffb3b3,stroke:#333,stroke-width:2px
+    style FrontendService fill:#d9edf7,stroke:#333,stroke-width:2px
+    style UserService fill:#dff0d8,stroke:#333,stroke-width:2px
+    style PostService fill:#fcf8e3,stroke:#333,stroke-width:2px
+    style UserDB fill:#ffe6cc,stroke:#333,stroke-width:2px
+    style PostDB fill:#ffe6cc,stroke:#333,stroke-width:2px
+```
 
 ### Monolith to Microservices Conversion Process
 
@@ -76,8 +140,38 @@ The major drawbacks of the monolithic architecture were:
 - **Frontend**: Flask templates or static HTML
 
 ### Project Structure
-blog-microservices-architecture/ │ ├── user-service/ # User management microservice │ ├── app.py # Main application file │ ├── models.py # User database models │ ├── requirements.txt # Python dependencies │ └── Dockerfile # Docker configuration │ ├── post-service/ # Blog post management microservice │ ├── app.py # Main application file │ ├── models.py # Post database models │ ├── requirements.txt # Python dependencies │ └── Dockerfile # Docker configuration │ ├── frontend-service/ # Frontend microservice │ ├── app.py # Main application file │ ├── static/ # Static files (HTML, CSS) │ └── Dockerfile # Docker configuration │ ├── api-gateway/ # API Gateway for routing │ ├── nginx.conf # NGINX configuration for routing │ └── Dockerfile # Docker configuration │ ├── kubernetes/ # Kubernetes deployment and service YAML files │ ├── user-service-deployment.yaml │ ├── post-service-deployment.yaml │ ├── frontend-service-deployment.yaml │ └── api-gateway-deployment.yaml │ └── README.md # Project documentation
-
+```
+blog-microservices-architecture/
+│
+├── user-service/             # User management microservice
+│   ├── app.py               # Main application file
+│   ├── models.py            # User database models
+│   ├── requirements.txt     # Python dependencies
+│   └── Dockerfile           # Docker configuration
+│
+├── post-service/            # Blog post management microservice
+│   ├── app.py              # Main application file
+│   ├── models.py           # Post database models
+│   ├── requirements.txt    # Python dependencies
+│   └── Dockerfile          # Docker configuration
+│
+├── frontend-service/        # Frontend microservice
+│   ├── app.py              # Main application file
+│   ├── static/             # Static files (HTML, CSS)
+│   └── Dockerfile          # Docker configuration
+│
+├── api-gateway/            # API Gateway for routing
+│   ├── nginx.conf          # NGINX configuration for routing
+│   └── Dockerfile          # Docker configuration
+│
+├── kubernetes/             # Kubernetes deployment and service YAML files
+│   ├── user-service-deployment.yaml
+│   ├── post-service-deployment.yaml
+│   ├── frontend-service-deployment.yaml
+│   └── api-gateway-deployment.yaml
+│
+└── README.md               # Project documentation
+```
 
 ---
 
@@ -87,10 +181,10 @@ blog-microservices-architecture/ │ ├── user-service/ # User management m
 ```bash
 git clone https://github.com/subhashpolisetti/blog-microservices-architecture.git
 cd blog-microservices-architecture
-
 ```
-#### Step 2: Build Docker Images
 
+#### Step 2: Build Docker Images
+```bash
 # Build User Service
 docker build -t user-service ./user-service
 
@@ -102,20 +196,21 @@ docker build -t frontend-service ./frontend-service
 
 # Build API Gateway
 docker build -t api-gateway ./api-gateway
-
+```
 
 #### Step 3: Deploy on Kubernetes
-
+```bash
 kubectl apply -f user-service/user-service-deployment.yaml
 kubectl apply -f post-service/post-service-deployment.yaml
 kubectl apply -f frontend-service/frontend-service-deployment.yaml
 kubectl apply -f api-gateway/api-gateway-deployment.yaml
-
+```
 
 ### Step 4: Access the Application
 Access the services through the API Gateway:
+- `/users/` for user operations
+- `/posts/` for post operations
+- `/frontend/` for the frontend interface
 
-/users/ for user operations
-/posts/ for post operations
-/frontend/ for the frontend interface
-
+### Contact
+Project Link: https://github.com/subhashpolisetti/blog-microservices-architecture
